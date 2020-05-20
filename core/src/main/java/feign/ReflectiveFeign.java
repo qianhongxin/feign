@@ -148,6 +148,15 @@ public class ReflectiveFeign extends Feign {
     }
 
     public Map<String, MethodHandler> apply(Target target) {
+        // target.type()就是我们标注了@FeignClient的接口类
+        //MethodMetadata 存储@FeignClient的接口中的方法的契约值，比如
+                 // 接口：
+                        //@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+                        //String deleteUser(@PathVariable("id") Long id);
+                // 得到的MethodMetadata是：
+                        // （1）方法的定义：ServiceAClient#deleteUser(Long)
+                        //（2）方法的返回类型：class java.lang.String
+                        //（3）发送HTTP请求的模板：DELETE /user/{id} HTTP/1.1
       List<MethodMetadata> metadata = contract.parseAndValidateMetadata(target.type());
       Map<String, MethodHandler> result = new LinkedHashMap<String, MethodHandler>();
       for (MethodMetadata md : metadata) {
