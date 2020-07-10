@@ -50,21 +50,27 @@ public class ReflectiveFeign extends Feign {
     Map<Method, MethodHandler> methodToHandler = new LinkedHashMap<Method, MethodHandler>();
     List<DefaultMethodHandler> defaultMethodHandlers = new LinkedList<DefaultMethodHandler>();
 
+    // target.type().getMethods()：反射，获取类的所有方法
     for (Method method : target.type().getMethods()) {
+        // method.getDeclaringClass():返回这个方法所在的类的字节码
       if (method.getDeclaringClass() == Object.class) {
         continue;
       } else if (Util.isDefault(method)) {
+          // 默认的方法放入defaultMethodHandlers，同时也放入methodToHandler
         DefaultMethodHandler handler = new DefaultMethodHandler(method);
         defaultMethodHandlers.add(handler);
         methodToHandler.put(method, handler);
       } else {
+          // 非默认的方法，放入methodToHandler
         methodToHandler.put(method, nameToHandler.get(Feign.configKey(target.type(), method)));
       }
     }
+    // 基于jdk动态代理实现
     InvocationHandler handler = factory.create(target, methodToHandler);
     T proxy = (T) Proxy.newProxyInstance(target.type().getClassLoader(),
         new Class<?>[] {target.type()}, handler);
 
+    // 默认方法绑定到代理对象
     for (DefaultMethodHandler defaultMethodHandler : defaultMethodHandlers) {
       defaultMethodHandler.bindTo(proxy);
     }
@@ -160,6 +166,7 @@ public class ReflectiveFeign extends Feign {
       List<MethodMetadata> metadata = contract.parseAndValidateMetadata(target.type());
       Map<String, MethodHandler> result = new LinkedHashMap<String, MethodHandler>();
       for (MethodMetadata md : metadata) {
+          // 构造BuildTemplate
         BuildTemplateByResolvingArgs buildTemplate;
         if (!md.formParams().isEmpty() && md.template().bodyTemplate() == null) {
           buildTemplate =
@@ -174,6 +181,7 @@ public class ReflectiveFeign extends Feign {
             throw new IllegalStateException(md.configKey() + " is not a method handled by feign");
           });
         } else {
+            // 创建MethodHandler，里面执行具体的调用，为后面的动态代理服务
           result.put(md.configKey(),
               factory.create(target, md, buildTemplate, options, decoder, errorDecoder));
         }

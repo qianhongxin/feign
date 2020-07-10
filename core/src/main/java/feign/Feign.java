@@ -64,6 +64,7 @@ public abstract class Feign {
    * @param method invoked method, present on {@code type} or its super.
    * @see MethodMetadata#configKey()
    */
+  // 将类名，方法名和参数类型，构造一个唯一字符串，标识唯一性
   public static String configKey(Class targetType, Method method) {
     StringBuilder builder = new StringBuilder();
     builder.append(targetType.getSimpleName());
