@@ -104,12 +104,17 @@ public class LoadBalancingTarget<T> implements Target<T> {
 
   @Override
   public Request apply(RequestTemplate input) {
+    // 根据负载均衡算法选择一个server出来
     Server currentServer = lb.chooseServer(null);
+    // 构造url
     String url = format("%s://%s%s", scheme, currentServer.getHostPort(), path);
+    // 设置RequestTemplate的url
     input.target(url);
     try {
+      // 创建一个request
       return input.request();
     } finally {
+      // 调用计数
       lb.getLoadBalancerStats().incrementNumRequests(currentServer);
     }
   }

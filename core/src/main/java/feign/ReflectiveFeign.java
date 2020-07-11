@@ -182,6 +182,7 @@ public class ReflectiveFeign extends Feign {
           });
         } else {
             // 创建MethodHandler，里面执行具体的调用，为后面的动态代理服务
+            // 创建的是 SynchronousMethodHandler。给每个方法都创建一个SynchronousMethodHandler
           result.put(md.configKey(),
               factory.create(target, md, buildTemplate, options, decoder, errorDecoder));
         }

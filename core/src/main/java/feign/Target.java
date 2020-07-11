@@ -27,6 +27,7 @@ import static feign.Util.emptyToNull;
  *
  * @param <T> type of the interface this target applies to.
  */
+// 根据RequestTemplate生成Request
 public interface Target<T> {
 
   /* The type of the interface this target applies to. ex. {@code Route53}. */
@@ -100,6 +101,7 @@ public interface Target<T> {
       if (input.url().indexOf("http") != 0) {
         input.target(url());
       }
+      // 根据requestTemplate构造一个Request
       return input.request();
     }
 

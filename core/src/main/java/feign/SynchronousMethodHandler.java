@@ -72,6 +72,7 @@ final class SynchronousMethodHandler implements MethodHandler {
 
   @Override
   public Object invoke(Object[] argv) throws Throwable {
+    // 根据参数构造请求模版
     RequestTemplate template = buildTemplateFromArgs.create(argv);
     Options options = findOptions(argv);
     Retryer retryer = this.retryer.clone();
@@ -98,6 +99,7 @@ final class SynchronousMethodHandler implements MethodHandler {
   }
 
   Object executeAndDecode(RequestTemplate template, Options options) throws Throwable {
+    // 构造http请求体
     Request request = targetRequest(template);
 
     if (logLevel != Logger.Level.NONE) {
@@ -107,6 +109,8 @@ final class SynchronousMethodHandler implements MethodHandler {
     Response response;
     long start = System.nanoTime();
     try {
+      // 发起请求，一般都是利用的http协议，所以client都是http客户端
+      // request是http请求体，options是网络超时参数
       response = client.execute(request, options);
       // ensure the request is set. TODO: remove in Feign 12
       response = response.toBuilder()
@@ -172,9 +176,11 @@ final class SynchronousMethodHandler implements MethodHandler {
   }
 
   Request targetRequest(RequestTemplate template) {
+    // 构造request前，执行拦截器逻辑
     for (RequestInterceptor interceptor : requestInterceptors) {
       interceptor.apply(template);
     }
+    // 创建request
     return target.apply(template);
   }
 

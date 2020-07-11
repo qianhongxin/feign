@@ -24,6 +24,7 @@ import feign.template.BodyTemplate;
 /**
  * An immutable request to an http server.
  */
+// http请求的各个部分，head，body等
 public final class Request {
 
   public static class Body {
@@ -262,6 +263,7 @@ public final class Request {
    * Controls the per-request settings currently required to be implemented by all {@link Client
    * clients}
    */
+  // 网络io的超时参数
   public static class Options {
 
     private final long connectTimeout;
